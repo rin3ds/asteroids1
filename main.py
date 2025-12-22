@@ -33,8 +33,6 @@ def main():
     asteroid_field = AsteroidField()
 
     print(f"Starting Asteroids with pygame version: {pygame.version.ver}")
-    print(f"Screen width: {SCREEN_WIDTH}")
-    print(f"Screen height: {SCREEN_HEIGHT}")
 
     run = True
     while run:
