@@ -65,7 +65,7 @@ class Player(CircleShape):
         if keys[pygame.K_e] and self.melee_cooldown <= 0:
             self.melee_active = True
             self.melee_cooldown = PLAYER_MELEE_COOLDOWN_SECONDS
-            self.melee_timer = 0.2
+            self.melee_timer = 0.5
 
         if self.melee_active:
             self.melee_timer -= dt
@@ -77,8 +77,7 @@ class Player(CircleShape):
 
         if keys[pygame.K_SPACE] and self.shoot_cooldown <= 0:
             shot = self.shoot()
-            for group in self.containers:
-                self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
+            self.shoot_cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
                 
             # --- Wrap-around logic ---
         if self.position.x < 0:

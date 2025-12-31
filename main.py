@@ -78,18 +78,14 @@ def main():
                 if asteroid.collides_with(player):
                     log_event("player_hit")
                     game_state = "game_over"
-    
-                
 
-            for asteroid in asteroids:
                 for shot in shots:
                     if asteroid.collides_with(shot):
                         log_event("asteroid_shot")
                         asteroid.split()
                         shot.kill()
                         score += 100
-            
-            for asteroid in asteroids:
+
                 if player.melee_active:
                     if asteroid.position.distance_to(player.position) < player.radius * 8:
                         asteroid.split()
