@@ -12,11 +12,18 @@ class Player(CircleShape):
         self.melee_active = False
 
         self.mech_sprite = pygame.image.load("mech_sprite.png").convert_alpha()
-        self.mech_sprite = pygame.transform.scale(self.mech_sprite, (PLAYER_RADIUS*5, PLAYER_RADIUS*5))
+        # scale sprite to match the hit box (diameter = 2 * radius)
+        self.mech_sprite = pygame.transform.scale(self.mech_sprite, (PLAYER_RADIUS * 4, PLAYER_RADIUS * 4))
         self.mech_sprite_shoot = pygame.image.load("mech_sprite_shoot.png").convert_alpha()
-        self.mech_sprite_shoot = pygame.transform.scale(self.mech_sprite_shoot, (PLAYER_RADIUS*5, PLAYER_RADIUS*5))
+        # scale shoot sprite to same size as normal sprite
+        self.mech_sprite_shoot = pygame.transform.scale(self.mech_sprite_shoot, (PLAYER_RADIUS * 4, PLAYER_RADIUS * 4))
         self.original_image = self.mech_sprite
         self.shooting = False
+        self.shooting_timer = 0
+        # toggle flips each time `shoot()` is called so shots alternate
+        self.shoot_toggle = False
+        # sprite to display while in shooting state (updated on each shot)
+        self.shooting_sprite = self.mech_sprite
         self.rect = self.original_image.get_rect(center=(x, y))
 
 
@@ -29,8 +36,8 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
-        # Draw the rotated mech sprite centered on the player position
-        current_sprite = self.mech_sprite_shoot if self.shooting else self.mech_sprite
+        # use the per-shot `shooting_sprite` while shooting, otherwise normal sprite
+        current_sprite = self.shooting_sprite if self.shooting else self.mech_sprite
         rotated_image = pygame.transform.rotate(current_sprite, -self.rotation + 180)
         self.rect = rotated_image.get_rect(center=(round(self.position.x), round(self.position.y)))
         screen.blit(rotated_image, self.rect)
@@ -47,8 +54,8 @@ class Player(CircleShape):
         self.position += rotated_vector * PLAYER_SPEED * dt * direction
 
     def shoot(self):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation) 
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * (self.radius * 1.2)
+        forward = pygame.Vector2(0, 1.5).rotate(self.rotation) 
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * (self.radius * 1.5)
 
         spawn_left = self.position + forward * (self.radius + SHOT_RADIUS) - right
         spawn_right = self.position + forward * (self.radius + SHOT_RADIUS) + right
@@ -58,9 +65,12 @@ class Player(CircleShape):
         
         shot_right = Shot(spawn_right.x, spawn_right.y, SHOT_RADIUS)
         shot_right.velocity = forward * PLAYER_SHOOT_SPEED
-        
-        self.shooting = not self.shooting
-        self.original_image = self.mech_sprite_shoot if self.shooting else self.mech_sprite
+        # flip the toggle so each shot alternates which shooting sprite is used
+        self.shoot_toggle = not self.shoot_toggle
+        self.shooting_sprite = self.mech_sprite_shoot if self.shoot_toggle else self.mech_sprite
+
+        self.shooting = True
+        self.shooting_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
         
         if hasattr(self, "containers"):
             for group in self.containers:
@@ -98,6 +108,11 @@ class Player(CircleShape):
 
         if self.shoot_cooldown > 0:
             self.shoot_cooldown -= dt
+
+        if self.shooting_timer > 0:
+            self.shooting_timer -= dt
+        else:
+            self.shooting = False
 
         if keys[pygame.K_SPACE] and self.shoot_cooldown <= 0:
             shot = self.shoot()

@@ -13,7 +13,7 @@ from shot import Shot
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Asteroids")
+    pygame.display.set_caption("Mifune")
     
 
     clock = pygame.time.Clock()
