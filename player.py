@@ -11,6 +11,15 @@ class Player(CircleShape):
         self.melee_cooldown = 0
         self.melee_active = False
 
+        self.mech_sprite = pygame.image.load("mech_sprite.png").convert_alpha()
+        self.mech_sprite = pygame.transform.scale(self.mech_sprite, (PLAYER_RADIUS*5, PLAYER_RADIUS*5))
+        self.mech_sprite_shoot = pygame.image.load("mech_sprite_shoot.png").convert_alpha()
+        self.mech_sprite_shoot = pygame.transform.scale(self.mech_sprite_shoot, (PLAYER_RADIUS*5, PLAYER_RADIUS*5))
+        self.original_image = self.mech_sprite
+        self.shooting = False
+        self.rect = self.original_image.get_rect(center=(x, y))
+
+
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -20,7 +29,12 @@ class Player(CircleShape):
         return [a, b, c]
     
     def draw(self, screen):
-        pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
+        # Draw the rotated mech sprite centered on the player position
+        current_sprite = self.mech_sprite_shoot if self.shooting else self.mech_sprite
+        rotated_image = pygame.transform.rotate(current_sprite, -self.rotation + 180)
+        self.rect = rotated_image.get_rect(center=(round(self.position.x), round(self.position.y)))
+        screen.blit(rotated_image, self.rect)
+
         if self.melee_active:
             pygame.draw.circle(screen, (255, 0, 0), self.position, self.radius * 4, 4)
 
@@ -33,17 +47,27 @@ class Player(CircleShape):
         self.position += rotated_vector * PLAYER_SPEED * dt * direction
 
     def shoot(self):
-        forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        spawn_position = self.position + forward * (self.radius + SHOT_RADIUS)
+        forward = pygame.Vector2(0, 1).rotate(self.rotation) 
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * (self.radius * 1.2)
 
-        shot = Shot(spawn_position.x, spawn_position.y, SHOT_RADIUS)
-        shot.velocity = forward * PLAYER_SHOOT_SPEED
+        spawn_left = self.position + forward * (self.radius + SHOT_RADIUS) - right
+        spawn_right = self.position + forward * (self.radius + SHOT_RADIUS) + right
+
+        shot_left = Shot(spawn_left.x, spawn_left.y, SHOT_RADIUS)
+        shot_left.velocity = forward * PLAYER_SHOOT_SPEED
+        
+        shot_right = Shot(spawn_right.x, spawn_right.y, SHOT_RADIUS)
+        shot_right.velocity = forward * PLAYER_SHOOT_SPEED
+        
+        self.shooting = not self.shooting
+        self.original_image = self.mech_sprite_shoot if self.shooting else self.mech_sprite
         
         if hasattr(self, "containers"):
             for group in self.containers:
-                group.add(shot)
+                group.add(shot_left)
+                group.add(shot_right)
         
-        return shot
+        return shot_left
     
 
     
