@@ -18,6 +18,12 @@ def main():
 
     clock = pygame.time.Clock()
     dt = 0
+    # Load background image (use repo root mech_game_bg.png)
+    try:
+        bg_image = pygame.image.load("mech_game_bg.png").convert()
+        bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    except Exception:
+        bg_image = None
     
     
     #score
@@ -92,8 +98,11 @@ def main():
                         score += 100
 
 
-            # Clear screen
-            screen.fill("black")
+            # Draw background (fallback to black)
+            if bg_image:
+                screen.blit(bg_image, (0, 0))
+            else:
+                screen.fill("black")
 
             # Draw all sprites
             for d in drawable:
@@ -104,7 +113,10 @@ def main():
             screen.blit(score_text, (10, 10))
 
         elif game_state == "game_over":
-            screen.fill("black")
+            if bg_image:
+                screen.blit(bg_image, (0, 0))
+            else:
+                screen.fill("black")
             game_over_text = font.render("GAME OVER", True, (255, 0, 0))
             score_text = font.render(f"Final Score: {score}", True, (255, 255, 255))
             restart_text = font.render("Press R to Restart or Q to Quit", True, (200, 200, 200))
