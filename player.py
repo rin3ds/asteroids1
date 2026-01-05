@@ -43,7 +43,7 @@ class Player(CircleShape):
         screen.blit(rotated_image, self.rect)
 
         if self.melee_active:
-            pygame.draw.circle(screen, (255, 0, 0), self.position, self.radius * 4, 4)
+            pygame.draw.circle(screen, (173, 216, 230), self.position, self.radius * 4, 4)
 
     def rotate(self, dt, direction):
         self.rotation += PLAYER_TURN_SPEED * dt * direction
