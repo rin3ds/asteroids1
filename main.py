@@ -18,7 +18,7 @@ def main():
 
     clock = pygame.time.Clock()
     dt = 0
-    # Load background image (use repo root mech_game_bg.png)
+    # load background
     try:
         bg_image = pygame.image.load("mech_game_bg.png").convert()
         bg_image = pygame.transform.scale(bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT))

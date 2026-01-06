@@ -30,8 +30,8 @@ class Asteroid(CircleShape):
             sprite = Asteroid.sprite_small if self.radius <= ASTEROID_MIN_RADIUS else Asteroid.sprite_large
 
         if sprite:
-            # scale sprite to roughly match the asteroid size (diameter ~ radius * 1.2)
-            size = max(1, int(self.radius * 1.2))
+            # scale sprite to roughly match the asteroid size (diameter ~ radius * 3)
+            size = max(1, int(self.radius * 3))
             scaled = pygame.transform.scale(sprite, (size, size))
             rotated = pygame.transform.rotate(scaled, -self.rotation)
             self.rect = rotated.get_rect(center=(round(self.position.x), round(self.position.y)))
