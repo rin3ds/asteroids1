@@ -3,6 +3,7 @@ from circleshape import CircleShape
 from shot import Shot
 from constants import *
 
+
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
@@ -25,6 +26,15 @@ class Player(CircleShape):
         # sprite to display while in shooting state (updated on each shot)
         self.shooting_sprite = self.mech_sprite
         self.rect = self.original_image.get_rect(center=(x, y))
+        
+        # load gun sound only if mixer is initialized
+        self.gun_sound = None
+        if pygame.mixer.get_init():
+            try:
+                self.gun_sound = pygame.mixer.Sound("gun_sound.wav")
+                self.gun_sound.set_volume(1.0)  # Set volume to max
+            except Exception as e:
+                print(f"Failed to load gun sound: {e}")
 
 
     def triangle(self):
@@ -71,6 +81,10 @@ class Player(CircleShape):
 
         self.shooting = True
         self.shooting_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
+        
+        # play gun sound
+        if self.gun_sound:
+            self.gun_sound.play()
         
         if hasattr(self, "containers"):
             for group in self.containers:

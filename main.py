@@ -1,5 +1,7 @@
 import pygame
 import sys
+import time
+import os
 from logger import log_state
 from logger import log_event
 from constants import *
@@ -8,10 +10,21 @@ from asteroid import Asteroid
 from asteroidfield import AsteroidField
 from shot import Shot
 
+# Change to script directory so relative paths work
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
 
 
 def main():
     pygame.init()
+    mixer_available = False
+    try:
+        pygame.mixer.init()
+        mixer_available = True
+        time.sleep(0.1)  # Give mixer time to initialize
+        print("Audio mixer initialized")
+    except Exception as e:
+        print(f"Warning: Audio device not available ({e}), sound disabled")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Mifune")
     
